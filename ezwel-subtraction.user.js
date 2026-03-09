@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         EZWEL Subtraction Autofill
-// @namespace    https://github.com/80ROkWOC4j/ezwel-deducter
-// @version      0.1.2
+// @namespace    https://github.com/80ROkWOC4j/ezwel-subtraction
+// @homepageURL  https://github.com/80ROkWOC4j/ezwel-subtraction
+// @supportURL   https://github.com/80ROkWOC4j/ezwel-subtraction/issues
+// @version      0.1.3
 // @description  EZWEL 복지몰 최근 3개월 카드 사용 내역 자동 차감 스크립트. 설치하면 이지웰 접속 시 우측 하단에 차감 버튼 생기고 이거 누르면 차감 버튼만 누르면 되게 셋팅 해줌.
 // @license      MIT
 // @match        https://*.ezwel.com/*
@@ -51,8 +53,6 @@
       '/customer/api/v1/private/welfarecard/subtraction-requisition/list',
     ],
   };
-
-  const PRIVACY_POPUP_TEXT = '사용 내역 조회를 위해 개인정보 제공동의가 필요합니다.';
 
   const runtime = {
     running: false,
@@ -268,10 +268,6 @@
       description: '조회하기 버튼',
     });
 
-    return requestQueryRows(0);
-  }
-
-  async function requestQueryRows(retryCount) {
     const initialState = inspectTableState();
     const queryBucket = runtime.requestBuckets.query;
     const startedBefore = queryBucket.started;
@@ -287,10 +283,6 @@
     }, '조회하기 클릭');
 
     const state = await waitForCondition(() => {
-      if (hasPrivacyConsentPopup()) {
-        return { kind: 'privacy' };
-      }
-
       const currentState = inspectTableState();
 
       if (queryBucket.started > startedBefore && queryBucket.pending > 0) {
@@ -298,7 +290,7 @@
       }
 
       if (queryBucket.finished > finishedBefore || hasTableStateMeaningfullyChanged(initialState, currentState)) {
-        return { kind: 'rows', rows: finalizeQueryState(currentState).rows };
+        return finalizeQueryState(currentState);
       }
 
       return null;
@@ -306,16 +298,6 @@
       timeoutMs: TIMEOUTS.queryResultsMs,
       description: '조회 결과',
     });
-
-    if (state.kind === 'privacy') {
-      dismissPrivacyConsentPopup();
-      if (retryCount < 1) {
-        await waitForPageReady();
-        return requestQueryRows(retryCount + 1);
-      }
-
-      throw new Error('개인정보 제공동의 상태가 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.');
-    }
 
     return state.rows;
   }
@@ -633,17 +615,6 @@
 
       return rect.width >= window.innerWidth * 0.5 && rect.height >= window.innerHeight * 0.4;
     });
-  }
-
-  function hasPrivacyConsentPopup() {
-    return cleanText(document.body.innerText).includes(PRIVACY_POPUP_TEXT);
-  }
-
-  function dismissPrivacyConsentPopup() {
-    const confirmButton = findButtonByText('확인');
-    if (confirmButton) {
-      clickElement(confirmButton);
-    }
   }
 
   async function clickUntil(getElement, predicate, description) {
