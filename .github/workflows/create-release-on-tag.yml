@@ -1,4 +1,4 @@
-name: Create GitHub Release On Tag
+name: Release
 
 on:
   push:
@@ -9,25 +9,35 @@ permissions:
   contents: write
 
 jobs:
-  create-release:
+  release:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Create GitHub release if missing
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Validate script syntax
+        run: node --check ezwel-subtraction.user.js
+
+      - name: Verify tag matches script version
+        shell: bash
         run: |
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Release $TAG_NAME already exists."
-          else
-            gh release create "$TAG_NAME" \
-              --title "$TAG_NAME" \
-              --generate-notes
+          tag_version="${GITHUB_REF_NAME}"
+          script_version="$(sed -n 's#// @version[[:space:]]*##p' ezwel-subtraction.user.js | head -n 1 | xargs)"
+
+          if [[ -z "$script_version" ]]; then
+            echo "Could not read @version from ezwel-subtraction.user.js"
+            exit 1
           fi
 
-          gh release upload "$TAG_NAME" \
-            ./ezwel-subtraction.user.js \
-            --clobber
+          if [[ "$tag_version" != "$script_version" ]]; then
+            echo "Tag version ($tag_version) does not match script version ($script_version)"
+            exit 1
+          fi
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ezwel-subtraction.user.js
+          fail_on_unmatched_files: true
+          generate_release_notes: false

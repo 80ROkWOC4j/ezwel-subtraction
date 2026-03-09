@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EZWEL Subtraction Autofill
 // @namespace    https://github.com/80ROkWOC4j/ezwel-deducter
-// @version      0.1.1
+// @version      0.1.2
 // @description  EZWEL 복지몰 최근 3개월 카드 사용 내역 자동 차감 스크립트. 설치하면 이지웰 접속 시 우측 하단에 차감 버튼 생기고 이거 누르면 차감 버튼만 누르면 되게 셋팅 해줌.
 // @license      MIT
 // @match        https://*.ezwel.com/*
