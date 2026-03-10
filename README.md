@@ -7,8 +7,9 @@
 ## 설치
 
 1. 브라우저에 `Violentmonkey` 또는 `Tampermonkey`를 설치합니다.
-2. https://greasyfork.org/ko/scripts/569046-ezwel-subtraction-autofill 에서 설치합니다.
-3. 로그인된 `https://*.ezwel.com/*` 탭에서 사용합니다.
+    > https://violentmonkey.github.io/get-it/
+3. https://greasyfork.org/ko/scripts/569046-ezwel-subtraction-autofill 에서 설치합니다.
+4. 로그인된 `https://*.ezwel.com/*` 탭에서 사용합니다.
 
 ## 동작
 
