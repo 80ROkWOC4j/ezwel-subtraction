@@ -3,7 +3,7 @@
 // @namespace    https://github.com/80ROkWOC4j/ezwel-subtraction
 // @homepageURL  https://github.com/80ROkWOC4j/ezwel-subtraction
 // @supportURL   https://github.com/80ROkWOC4j/ezwel-subtraction/issues
-// @version      0.1.5
+// @version      0.1.3
 // @description  EZWEL 복지몰 최근 3개월 카드 사용 내역 자동 차감 스크립트. 설치하면 이지웰 접속 시 우측 하단에 차감 버튼 생기고 이거 누르면 차감 버튼만 누르면 되게 셋팅 해줌.
 // @license      MIT
 // @match        https://*.ezwel.com/*
@@ -77,10 +77,10 @@
   }
 
   function initialize() {
+    installRequestTracker();
     injectStyles();
     ensureUi();
     syncUi('idle');
-    installRequestTracker();
 
     if (hasAutostartFlag()) {
       if (isTargetPage()) {
@@ -161,33 +161,10 @@
 
     const root = document.createElement('div');
     root.id = UI_IDS.root;
-    root.style.position = 'fixed';
-    root.style.right = '20px';
-    root.style.bottom = '20px';
-    root.style.zIndex = '2147483647';
-    root.style.display = 'flex';
-    root.style.flexDirection = 'column';
-    root.style.alignItems = 'flex-end';
-    root.style.gap = '8px';
-    root.style.fontFamily = '"Segoe UI", "Apple SD Gothic Neo", sans-serif';
 
     const button = document.createElement('button');
     button.id = UI_IDS.button;
     button.type = 'button';
-    button.style.minWidth = '160px';
-    button.style.maxWidth = '280px';
-    button.style.padding = '12px 18px';
-    button.style.border = '0';
-    button.style.borderRadius = '14px';
-    button.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)';
-    button.style.color = '#fff';
-    button.style.fontSize = '14px';
-    button.style.fontWeight = '700';
-    button.style.lineHeight = '1.45';
-    button.style.boxShadow = '0 14px 30px rgba(15, 23, 42, 0.24)';
-    button.style.cursor = 'pointer';
-    button.style.whiteSpace = 'normal';
-    button.style.textAlign = 'center';
     button.addEventListener('click', onActionClick);
     root.appendChild(button);
     document.body.appendChild(root);
@@ -545,25 +522,6 @@
     runtime.button.dataset.state = state;
     runtime.button.disabled = state === 'running' || state === 'pending-navigation';
     runtime.button.textContent = getButtonLabel(state, detail);
-    runtime.button.style.opacity = runtime.button.disabled ? '0.92' : '1';
-    runtime.button.style.cursor = runtime.button.disabled ? 'wait' : 'pointer';
-
-    if (state === 'done') {
-      runtime.button.style.background = 'linear-gradient(135deg, #047857, #059669)';
-      return;
-    }
-
-    if (state === 'error') {
-      runtime.button.style.background = 'linear-gradient(135deg, #b91c1c, #dc2626)';
-      return;
-    }
-
-    if (state === 'running' || state === 'pending-navigation') {
-      runtime.button.style.background = 'linear-gradient(135deg, #1d4ed8, #2563eb)';
-      return;
-    }
-
-    runtime.button.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)';
   }
 
   function getButtonLabel(state, detail) {
